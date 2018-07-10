@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>计算属性的用法3</title>
+</head>
+<body>
+	<script src="vue.min.js"></script>
+	<div id="app1"></div>
+	<div id="app2">
+		{{ reversedText }}
+	</div>
+	<script>
+	// 计算属性。
+		var app1 = new Vue({
+			el: '#app1',
+			data: {
+				text: '123,456'
+			},
+		})
+		var app2 = new Vue({
+			el: '#app2',
+			computed:{
+				reversedText:function(){
+					// 这里依赖的是app1的数据text
+					return app1.text.split(',').reverse().join(',');
+				}
+			}
+		})
+
+	</script>
+</body>
+</html>

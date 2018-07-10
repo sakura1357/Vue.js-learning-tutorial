@@ -1,0 +1,43 @@
+第3章 计算属性
+	1.什么是计算属性
+	在模板中双向绑定数据或表达式中，如表达式过长或逻辑比较复杂的话，就会变得臃肿甚至难以阅读和维护。
+	<div>
+		{{ text.split(',').reverse().join(',') }}
+	</div>
+	所以在遇到复杂逻辑时应该使用计算属性：
+	<div id="app">
+		{{ reversedText }}
+	</div>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data:{
+				Text:'123,456'
+			},
+			computed:{
+				reversedText: function(){
+					// this指向的当前Vue实例
+					return this.text.split(',').reverse().join(',');
+				}
+			}
+		})
+	</script>
+	所有的计算属性都以函数的形式写在Vue实例内的computed选项内，最终返回计算后的结果。
+
+	2.计算属性用法
+	在一个计算属性里可以完成各种复杂的逻辑，包括运算、函数调用等，只要最终返回一个结果就可以。
+	计算属性还可以依赖多个Vue实例的多个数据，只要其中任一数据变化，计算属性就会重新执行，视图也会更新。
+	计算属性的方法： getter和setter，大多数情况下，我们只会用默认的getter方法来获取计算属性，在业务中很少用到setter。
+
+	3.计算属性缓存
+	计算属性是基于它的依赖缓存的。一个计算属性所依赖的数据发生变化时，它才会重新取值，所以依赖的数据只要不改变，计算属性也就不更新。当遍历大数组和做大量计算时，应当使用计算属性，除非你不希望得到缓存。
+	computed:{
+		now:function(){
+			return Date.now();
+		}
+	}
+
+
+第4章 v-bind及class与style绑定
+
+	
