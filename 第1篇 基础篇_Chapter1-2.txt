@@ -1,4 +1,8 @@
-React是用js来包含html, 而Vue.js, Angular之类的是用html来包含js
+React是用js来包含html, 而Vue.js, Angular之类的是用html来包含js。
+
+目录：
+	第1章 初识Vue.js
+	第2章 数据绑定和第一个Vue应用
 
 第1章 初识Vue.js
 

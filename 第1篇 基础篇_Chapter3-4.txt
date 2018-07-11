@@ -1,0 +1,231 @@
+目录：
+	第3章 计算属性
+	第4章 v-bind及class与style绑定
+
+第3章 计算属性
+	1.什么是计算属性
+	在模板中双向绑定数据或表达式中，如表达式过长或逻辑比较复杂的话，就会变得臃肿甚至难以阅读和维护。
+	<div>
+		{{ text.split(',').reverse().join(',') }}
+	</div>
+	所以在遇到复杂逻辑时应该使用计算属性：
+	<div id="app">
+		{{ reversedText }}
+	</div>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data:{
+				Text:'123,456'
+			},
+			computed:{
+				reversedText: function(){
+					// this指向的当前Vue实例
+					return this.text.split(',').reverse().join(',');
+				}
+			}
+		})
+	</script>
+	所有的计算属性都以函数的形式写在Vue实例内的computed选项内，最终返回计算后的结果。
+
+	2.计算属性用法
+	在一个计算属性里可以完成各种复杂的逻辑，包括运算、函数调用等，只要最终返回一个结果就可以。
+	计算属性还可以依赖多个Vue实例的多个数据，只要其中任一数据变化，计算属性就会重新执行，视图也会更新。
+	计算属性的方法： getter和setter，大多数情况下，我们只会用默认的getter方法来获取计算属性，在业务中很少用到setter。
+
+	3.计算属性缓存
+	计算属性是基于它的依赖缓存的。一个计算属性所依赖的数据发生变化时，它才会重新取值，所以依赖的数据只要不改变，计算属性也就不更新。当遍历大数组和做大量计算时，应当使用计算属性，除非你不希望得到缓存。
+	computed:{
+		now:function(){
+			return Date.now();
+		}
+	}
+
+
+第4章 v-bind及class与style绑定
+	1.了解v-bind指令
+	v-bind指令可以动态绑定DOM元素的属性(比如：href、src、class、style等)，当数据变化时，就会重新渲染。
+	在数据绑定中，最常见的两个需求就是元素的样式名称class和内联样式style的动态绑定，因此Vue.js增强了对class和style的绑定。
+	<div id="app">
+		<a :href="url">链接</a>
+		<img :src="imgUrl">
+	</div>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: {
+				url: 'https://www.baidu.com',
+				imgUrl: 'https://zz.zzz.zz/img.png'
+			}
+		})
+	</script>
+
+	2.绑定class的几种方式
+		1)对象语法
+		• 给v-bind:class设置一个对象，可以动态地切换class，例如：
+		<!-- 类名active依赖于数据isActive，当其为true时，div会拥有类名active，为false时则没有。 -->
+		<div id="app">
+			<div :class="{ 'active': isActive }"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					isActive: true
+				}
+			})
+		</script>
+		上述最终渲染结果：
+		<div id="app">
+			<div id="active"></div>
+		</div>
+		• 对象中也可以传入多个属性，来动态切换class。此外，:class也可以和普通class共存。
+		<!-- :class内的表达式每项为true时，对应的类名就会加载。 -->
+		<!-- :class内的表达式，当isError为true时，就会加载error类名。 -->
+		<div id="app">
+			<div class="static" :class="{ 'active': isActive, 'error': isError }"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					isActive: true,
+					isError: false,
+				}
+			})
+		</script>
+		上述最终渲染结果：
+		<div id="app">
+			<div class="static active"></div>
+		</div>
+		• 当:class的表达式过长或者逻辑复杂时，还可以绑定一个计算属性，这是一种很友好和常见的用法，一般当条件多于两个时，都可以使用data或者computed
+		<div id="app">
+			<div :class="classes"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					isActive: true,
+					error: null
+				},
+				computed:{
+					classes: function(){
+						return {
+							active: this.isActive && !this.error,
+							'text-fail': this.error && this.error.type === 'fail'
+						}
+					}
+				}
+
+			})
+		</script>
+		2)数组语法
+		当需要应用多个class时，可以使用数组语法，给:class绑定一个数组，应用一个class列表：
+		<div id="app">
+			<div :class="{ activeCls, errorCls }"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					activeCls: 'active',
+					errorCls: 'error'
+				}
+			})
+		</script>
+		上述最终渲染结果：
+		<div id="app">
+			<div class="active error"></div>
+		</div>
+		也可以使用三元表达式来切换class：
+		样式error会始终应用，当数据isActive为真时，样式active才会被应用。
+		<div id="app">
+			<div :class="{ isActive ? activeCls : '', errorCls}"></div>
+		</div>
+		<script>
+			var app  = new Vue({
+				el: '#app',
+				data: {
+					isActive: true,
+					activeCls: 'active',
+					errorCls: 'error'
+				}
+			})
+		</script>
+		class有多个条件时，也可以在数组语法中使用对象语法：
+		<div id="app">
+			<div :class="[{'active': isActive}, errorCls]"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					isActive: true,
+					errorCls: 'error'
+				}
+			})
+		</script>
+		与对象语法一样，也可以使用data、computed、methods三种方法，以计算属性为例：
+		<div id="app">
+			<button :class="classes"></button>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					size: 'large',
+					disabled: true
+				},
+				computed:{
+					classes:function(){
+						return {
+							'btn',
+							{
+								['btn-' + this.size]: this.size !== '',
+								['btn-disabled']: this.disabled
+							}
+						};
+					}
+				}
+			})
+		</script>
+		最终渲染的结果为：
+		<button class="btn btn-large btn-disabled"></button>
+	3.绑定内联样式
+	使用v-bind:style即:style来给元素绑定内联样式，方法与:class类似，也有对象语法和数组语法。
+		1)对象语法
+		<div id="app">
+			<div :style="{'color': color, 'fontSize': fontSize + 'px' }">文本</div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					color: 'red',
+					fontSize: 14
+				}
+			})
+		</script>
+		CSS属性名称使用驼峰命名（camelCase）或短横分隔命名（kebab-case），渲染后的结果为：
+		<div style="color: red; font-size: 14px;">文本</div>
+		大多数情况下，直接写一长串的样式不便于阅读和维护，所以一般写在data或computed里，以data为例改写上面的示例：
+		<div id="app">
+			<div :style="styles"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data:{
+					styles:{
+						color: 'red',
+						fontSize: 14 + 'px'
+					}
+				}
+			})
+		</script>
+		2)数组语法
+		应用多个样式对象时可以使用数组语法：
+		<div :style="{ styleA, styleB }">文本</div>
+		在实际业务中，:style的数组语法并不常用，因为往往可以写在一个对象里面；而较为常用的应当是计算属性。
+		另外，使用:style时，Vue.js会自动给特殊的CSS属性名称增加前缀，比如transform。
