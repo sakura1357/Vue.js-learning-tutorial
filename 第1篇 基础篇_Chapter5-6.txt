@@ -7,5 +7,293 @@
 	Vue.js的指令是带有特殊前缀"v-"的HTML特性，它绑定一个表达式，并将一些特性应用到DOM上。
 	之前用到过的指令有： v-bind, v-model, v-html, v-pre, v-if, v-on等。
 	1.基本指令
-	
-	
+		1)v-cloak
+		v-cloak不需要表达式，它会在Vue实例结束编译时从绑定的HTML元素上移除，经常和css的display:none；配合使用：
+			<div id="app" v-cloak>
+				{{ message }}
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						message: '这是一段文本'
+					}
+				})
+			</script>
+			当网速较慢、Vue.js文件还没加载完时，在页面上会显示{{ message }}的字样，直到Vue创建实例、编译模板时，DOM 才会被替换，所以这个过程屏幕是有闪动的。只要加一句CSS就可以解决这个问题了:
+			CSS样式：
+			[v-cloak] {
+				display: none;
+			}
+			在一般情况下，v-cloak是一个解决初始化慢导致页面闪动的最佳实践。
+		2)v-once
+		v-once 也是一个不需要表达式的指令，作用是定义它的元素或组件只渲染一次，包括元素或组件的所有子节点。首次渲染后，不再随数据的变化重新渲染，将被视为静态内容。v-once在业务中很少使用，当你需要进一步优化性能时，可能会用到。
+		<div id="app">
+			<span v-once>{{ message }}</span>
+			<div v-once>{{ message }}</div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					message: '一段文本'
+				}
+			})
+		</script>
+	2.条件渲染指令
+		1)v-if、v-else-if、v-else
+		条件指令可以根据表达式的值在DOM中渲染或销毁元素／组件。
+		v-else-if要紧跟v-if, v-else要紧跟v-else-if 或v-if，
+		表达式的值为真时， 当前元素／组件及所有子节点将被渲染，为假时被移除。
+		如果一次判断的是多个元素，可以在Vue.js内置的<template>元素上使用条件指令。
+			<div id="app">
+				<p v-if="status === 1">当status为1时显示该行</p>
+				<p v-else-iff="status === 2">当status为2时显示该行</p>
+				<p v-else>否则显示该行</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						status: 1
+					}
+				})
+			</script>
+		2)v-show
+		v-show用法与v-if基本一致，v-show是改变元素的CSS属性display。当v-show表达式值为false时，元素会隐藏
+		注意：v-show不能在<template>上使用
+			<div id="app">
+				<p v-show="status === 1">当status为1时显示该行</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						status: 2
+					}
+				})
+			</script>
+			渲染后的结果：
+				<div id="app">
+					<p style="display: none">当status为1时显示该行</p>
+				</div>
+		3)v-if与v-show的选择
+		v-if和v-show具有类似的功能，不过v-if才是真正的条件渲染，它会根据表达式适当地销毁或重建元素及绑定的事件或子组件。若表达式初始值为false，则一开始元素／组件并不会渲染，只有当条件第一次变为true时才开始编译。
+		而v-show只是简单的CSS属性切换，无论条件真与否，都会被编译。相比之下，v-if更适合条件不经常改变的场景，因为它切换开销相对较大，而v-show适用于频繁切换条件。
+	3.列表渲染指令v-for
+		1)基本用法
+		当遍历数据时（数组遍历、对象循环显示等），就会用到列表渲染指令v-for。它的表达式需要结合in来使用，类似item in items的形式。
+		• in关键字也可以用of代替，这样更接近Javascript迭代器的语法。
+		• v-for表达式支持一个可选参数作为当前项的索引
+			<div id="app">
+				<ul>
+					<li v-for="book in books">{{ book.name }}</li>
+					<li v-for="book of books">{{ book.name }}</li>
+					<li v-for="{(book, index) in books }">{{ index }} - {{ book.name }}</li>
+				</ul>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						books:[
+							{name: "《Vue.js实战》"},
+							{name: "《Javascript语言精粹》"},
+							{name: "《Javascript高级程序设计》"}
+						]
+					}
+				})
+			</script>
+		• v-for也可以用在内置标签<template>上，将数组(多个元素)渲染：
+			<div id="app">
+				<ul>
+					<template v-for="book in books">
+						<li>书名：{{ book.name }}</li>
+						<li>作者：{{ book.author }}</li>
+					</template>
+				</ul>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data:{
+						books:[
+							{
+								name: "《Vue.js实战》",
+								author: '梁灏'
+							},							
+							{
+								name: "《Javascript语言精粹》",
+								author: 'Douglas Crockford'
+							},							
+							{
+								name: "《Javascript高级程序设计》",
+								author: 'Nicholas C.Zakas'
+							}
+						]
+					}
+				})
+			</script>
+		• v-for还可以遍历对象的属性：
+			<div id="app">
+				<span v-for="value in user">{{ value }}</span>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						user:{
+							name: '李晓满',
+							gender: '女',
+							age: 25
+						}
+					}
+				})
+			</script>
+		• v-for遍历对象属性时，有两个可选参数，分别是键名和索引：
+			<div id="app">
+				<ul>
+					<li v-for="(value, key, index) in user">
+						{{index}} - {{key}}: {{value}}
+					</li>
+				</ul>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						user: {
+							name: 'Xiaoman Li',
+							gender: 'female',
+							age: 25
+						}
+					}
+				})
+			</script>
+		• v-for还可以遍历整数
+			<div id="app">
+				<span v-for="n in 10">{{ n }}</span>
+			</div>
+			<script>
+				var app =new Vue({
+					el: '#app'
+				})
+			</script>
+		2)数组更新
+		当修改数组时，Vue会检测到数据变化，v-for渲染的视图也会立即更新。
+		• 以下方法会改变调用的原始数组：
+		push()、pop()
+		shift()、unshift()
+		splice()、sort()
+		reverse()
+		举例：
+			<div id="app">
+				<ul>
+					<template v-for="book in books">
+						<li>书名：{{ book.name }}</li>
+						<li>作者：{{ book.author }}</li>
+					</template>
+				</ul>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data:{
+						books:[
+							{
+								name: "《Vue.js实战》",
+								author: '梁灏'
+							},							
+							{
+								name: "《Javascript语言精粹》",
+								author: 'Douglas Crockford'
+							},							
+							{
+								name: "《Javascript高级程序设计》",
+								author: 'Nicholas C.Zakas'
+							}
+						]
+					}
+				})
+				app.books.push({
+					name: '《CSS揭秘》',
+					author: '[希] Lea Verou'
+				});
+			</script>
+
+		• 以下方法不会改变原数组，而是返回一个新数组：
+		filter()
+		concat()
+		slice()
+		举例：
+			<div id="app">
+				<ul>
+					<template v-for="book in books">
+						<li>书名：{{ book.name }}</li>
+						<li>作者：{{ book.author }}</li>
+					</template>
+				</ul>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						books:[
+							{
+								name: "《Vue.js实战》",
+								author: '梁灏'
+							},							
+							{
+								name: "《Javascript语言精粹》",
+								author: 'Douglas Crockford'
+							},							
+							{
+								name: "《Javascript高级程序设计》",
+								author: 'Nicholas C.Zakas'
+							}
+						]
+					}
+				})
+				app.books = app.books.filter(function(item){
+					return item.name.match(/Javascript高级程序设计/);
+				});
+			</script>
+		3)过滤与排序
+		不想改变原数组，想通过数组的副本做过滤或排序的显示时，可以使用计算属性来返回过滤或排序后的数组。
+		举例：
+			<div id="app">
+				<ul>
+					<template v-for="book in filterBooks">
+						<li>书名：{{ book.name }}</li>
+						<li>作者：{{ book.author }}</li>
+					</template>
+				</ul>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data:{
+						books:[
+							{
+								name: "《Vue.js实战》",
+								author: '梁灏'
+							},							
+							{
+								name: "《Javascript语言精粹》",
+								author: 'Douglas Crockford'
+							},							
+							{
+								name: "《Javascript高级程序设计》",
+								author: 'Nicholas C.Zakas'
+							}
+						]		
+					}
+				}),
+				computed:{
+					filterBooks:function(){
+						return this.books.filter(function(book){
+							return book.name.match(/Javascript/);
+						});
+					}
+				}
+			</script>

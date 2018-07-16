@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>v-for遍历</title>
+</head>
+<body>
+	<script src="vue.min.js"></script>
+	<h1>• v-for遍历</h1>
+	<div id="app">
+		<ul>
+			<!-- in关键字也可以用of代替，这样更接近Javascript迭代器的语法。 -->
+			<!-- <li v-for="book of books">{{ book.name }}</li> -->
+			<li v-for="book in books">{{ book.name }}</li>
+		</ul>
+	</div>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: {
+				books:[
+				{name: "《Vue.js实战》"},
+				{name: "《Javascript语言精粹》"},
+				{name: "《Javascript高级程序设计》"}
+				]
+			}
+		})
+	</script>
+	<hr>
+	<!-- v-for指令遍历数组 -->
+	<h1>• v-for指令遍历数组</h1>
+	<div id="app1">
+		<ul>
+			<template v-for="book in books">
+				<li>书名：{{ book.name }}</li>
+				<li>作者：{{ book.author }}</li>
+			</template>
+		</ul>
+	</div>
+	<script>
+		var app = new Vue({
+			el: '#app1',
+			data:{
+				books:[
+					{
+						name: "《Vue.js实战》",
+						author: '梁灏'
+					},							
+					{
+						name: "《Javascript语言精粹》",
+						author: 'Douglas Crockford'
+					},							
+					{
+						name: "《Javascript高级程序设计》",
+						author: 'Nicholas C.Zakas'
+					}
+				]
+			}
+		})
+	</script>
+	<hr>
+	<h1>• v-for指令遍历对象的属性</h1>
+	<div id="app2">
+		<ul>
+			<li v-for="value in user">{{ value }}</li>
+		</ul>		
+	</div>
+	<script>
+		var app2 = new Vue({
+			el: '#app2',
+			data: {
+				user:{
+					name: '李晓满',
+					gender: '女',
+					age: 25
+				}
+			}
+		})
+	</script>
+	<h1>• v-for指令遍历对象属性，两个可选参数：键名key和索引index</h1>
+	<div id="app3">
+		<ul>
+			<li v-for="(value, key, index) in user">
+				{{index}} - {{key}}: {{value}}
+			</li>
+		</ul>
+	</div>
+	<script>
+		var app3 = new Vue({
+			el: '#app3',
+			data: {
+				user: {
+					name: 'Xiaoman Li',
+					gender: 'female',
+					age: 25
+				}
+			}
+		})
+	</script>
+
+	<h1>• v-for还可以遍历整数</h1>
+	<div id="app4">
+		<span v-for="n in 10">{{ n }}</span>
+	</div>
+	<script>
+		var app4 =new Vue({
+			el: '#app4'
+		})
+	</script>
+	<h1>• v-for数组更新</h1>	
+	<div id="app5">
+		<ul>
+			<template v-for="book in books">
+				<li>书名：{{ book.name }}</li>
+				<li>作者：{{ book.author }}</li>
+			</template>
+		</ul>
+	</div>
+	<script>
+		var app5 = new Vue({
+			el: '#app5',
+			data:{
+				books:[
+					{
+						name: "《Vue.js实战》",
+						author: '梁灏'
+					},							
+					{
+						name: "《Javascript语言精粹》",
+						author: 'Douglas Crockford'
+					},							
+					{
+						name: "《Javascript高级程序设计》",
+						author: 'Nicholas C.Zakas'
+					}
+				]
+			}
+		})
+		app5.books.push({
+			name: '《CSS揭秘》',
+			author: '[希] Lea Verou'
+		})
+	</script>
+	<h1>• v-for数组更新,返回新数组</h1>	
+	<div id="app6">
+		<ul>
+			<template v-for="book in books">
+				<li>书名：{{ book.name }}</li>
+				<li>作者：{{ book.author }}</li>
+			</template>
+		</ul>
+	</div>
+	<script>
+		var app6 = new Vue({
+			el: '#app6',
+			data: {
+				books:[
+					{
+						name: "《Vue.js实战》",
+						author: '梁灏'
+					},							
+					{
+						name: "《Javascript语言精粹》",
+						author: 'Douglas Crockford'
+					},							
+					{
+						name: "《Javascript高级程序设计》",
+						author: 'Nicholas C.Zakas'
+					}
+				]
+			}
+		})
+		app6.books = app6.books.filter(function(item){
+			return item.name.match(/Javascript/);
+		});
+	</script>
+<h1>• v-for数组的过滤与排序</h1>	
+	<div id="app7">
+		<ul>
+			<template v-for="book in filterBooks">
+				<li>书名：{{ book.name }}</li>
+				<li>作者：{{ book.author }}</li>
+			</template>
+		</ul>
+	</div>
+	<script>
+		var app7 = new Vue({
+			el: '#app7',
+			data: {
+				books:[
+					{
+						name: "《Vue.js实战》",
+						author: '梁灏'
+					},							
+					{
+						name: "《Javascript语言精粹》",
+						author: 'Douglas Crockford'
+					},							
+					{
+						name: "《Javascript高级程序设计》",
+						author: 'Nicholas C.Zakas'
+					}
+				]
+			},
+			computed: {
+				filterBooks:function(){
+					return this.books.filter(function(book){
+						return book.name.match(/Javascript/);
+					});
+				}
+			}
+		})
+
+	</script>
+</body>
+</html>
