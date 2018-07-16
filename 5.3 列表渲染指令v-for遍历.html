@@ -177,7 +177,7 @@
 <h1>• v-for数组的过滤与排序</h1>	
 	<div id="app7">
 		<ul>
-			<template v-for="book in filterBooks">
+			<template v-for="book in sortedBooks">
 				<li>书名：{{ book.name }}</li>
 				<li>作者：{{ book.author }}</li>
 			</template>
@@ -203,9 +203,16 @@
 				]
 			},
 			computed: {
+				// 过滤出书名是JavaScript开头的书籍
 				filterBooks:function(){
 					return this.books.filter(function(book){
 						return book.name.match(/Javascript/);
+					});
+				},
+				// 先过滤，然后将过滤后的结果filterBooks，根据书名的长度排序并返回结果
+				sortedBooks:function(){
+					return this.filterBooks.sort(function(a, b){
+						return a.name.length < b.name.length;
 					});
 				}
 			}

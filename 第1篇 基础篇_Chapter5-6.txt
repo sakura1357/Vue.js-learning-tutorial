@@ -297,3 +297,40 @@
 					}
 				}
 			</script>
+	4.方法与事件
+		1)基本用法
+		v-on事件监听：在普通HTML元素上，v-on可以监听原生的DOM事件。
+		举例1：
+			<div id="app">
+				点击次数：{{ counter }}
+				<button  @click="counter++">+ 1</button>
+			</div>
+			<script>
+				var app =new Vue({
+					el: '#app',
+					data: {
+						counter : 0
+					}
+				})
+			</script>
+		举例2：
+			<div id="app">
+				点击次数：{{ counter }}
+				<button @click='handleAdd()'>+ 1</button>
+				<button @click='handleAdd(10)'>+ 10</button>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						counter: 0
+					},
+					methods:{
+						handleAdd: function(count){
+							count = count || 1;
+							// this指向当前Vue实例app
+							this.counter += count;
+						}
+					}
+				})
+			</script>
