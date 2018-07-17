@@ -1,6 +1,13 @@
 目录：
 	第5章 内置指令
-
+		5.1 基本指令
+			# v-cloak、v-once
+		5.2 条件渲染指令
+			# v-if、v-show
+		5.3 列表渲染指令
+			# v-for
+		5.4 方法与事件
+			# v-on
 
 第5章 内置指令
 	指令：Directive
@@ -334,3 +341,78 @@
 					}
 				})
 			</script>
+		@click="method()"，如果该方法有参数，默认会将原生事件对象event传入；如果方法不需要传入参数，为了简便可以不写括号。
+		Vue提供了一个特殊变量$event，用于访问原生DOM事件。
+		举例：
+			<div id="app">
+				<a href="https://www.baidu.com" @click="handleClick('禁止打开', $event)"></a>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					methods: {
+						handleClick:function(message, event){
+							event.preventDefault();
+							window.alert(message);
+						}
+					}
+				})
+			</script>
+		2)修饰符
+		@绑定事件后面可以加个圆点"."，再跟一个后缀来使用修饰符。Vue支持以下修饰符：
+			.stop
+			.prevent
+			.capture
+			.self
+			.once
+		具体用法：
+			<!-- 阻止单击事件冒泡 -->
+			<a @click.stop="handle"></a>
+			<!-- 提交事件不再重载页面 -->
+			<form @submit.prevent="handle"></form>
+			<!-- 修饰符可以串联 -->
+			<a @click.stop.prevent="handle"></a>
+			<!-- 只有修饰符 -->
+			<form @submit.prevent></form>
+			<!-- 添加事件侦听器使用事件捕获模式 -->
+			<div @click.capture="handle">...</div>
+			<!-- 只当事件在该元素本身（而不是子元素）触发时触发回调 -->
+			<div @click.self="handle">...</div>
+			<!-- 只触发一次 -->
+			<div @click.once="handle">...</div>]
+
+		Vue在监听键盘事件时，可以使用按键修饰符.keyup.keyCode:
+			<!-- 只有在keycode是13时调用submit() -->
+			<input @keyup.13="submit">
+		也可以自定义具体按键：
+			<!-- 设置f1按键的按键修饰符keyCode是112 -->
+			Vue.config.keyCodes.f1 = 112;
+			<!-- 调用如下： -->
+			<input @keyup.112="submit">
+
+		除了具体的某个keyCode以外，Vue还提供了快捷名称：
+			.enter(回车键)
+			.tab(tab键)
+			.delete(捕获"删除delete"和"退格backspace"键)
+			.esc(退出键)
+			.space(空格键)
+			.up(方向键-上)
+			.down(方向键-下)
+			.left(方向键-左)
+			.right(方向键-右)
+			.ctrl(ctrl键)
+			.alt(alt键)
+			.shift(shift键)
+			.meta(Mac下是Command键，Windows是Windows徽标键)
+
+			按键修饰符可以组合使用，或者和鼠标一起配合使用：
+			举例：
+			<!-- Shift + S -->
+			<input @keyup.shift.83="handleSave">
+			<!-- Ctrl + Click -->
+			<div @click.ctrl="doSomething">Do something</div>
+
+
+
+
+

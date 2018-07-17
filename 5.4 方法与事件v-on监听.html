@@ -5,6 +5,7 @@
 		<title>5.4 方法与事件监听v-on</title>
 	</head>
 	<body>
+		<h1>1.v-on事件监听</h1>
 		<script src="vue.min.js"></script>
 		<div id="app1">
 			点击次数：{{ counter }}
@@ -18,7 +19,7 @@
 				}
 			})
 		</script>
-	<h1>zzzzzzzzz</h1>
+	<h1>2.v-on事件监听扩展</h1>
 	<div id="app2">
 		点击次数：{{ counter }}
 		<button @click='handleAdd()'>+ 1</button>
@@ -38,6 +39,35 @@
 					count = count || 1;
 					// this指向当前Vue实例app
 					this.counter += count;
+				}
+			}
+		})
+	</script>
+	<h1>3.使用$event变量访问原生DOM事件</h1>
+	<div id="app3">
+		<a href="https://www.baidu.com" @click="handleClick('禁止打开', $event)">打开链接</a>
+	</div>
+	<script>
+		var app3 = new Vue({
+			el: '#app3',
+			methods: {
+				handleClick:function(message, event){
+					event.preventDefault();
+					window.alert(message);
+				}
+			}
+		})
+	</script>
+	<h1>4.使用修饰符.</h1>
+	<div id="app4">
+		<div @click.ctrl="doSomething">Do something</div>
+	</div>
+	<script>
+		var app4 = new Vue({
+			el: '#app4',
+			methods: {
+				doSomething:function(){
+					window.alert('Do something, ho~')
 				}
 			}
 		})
