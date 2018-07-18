@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Vue购物车示例</title>
+		<title>Vue购物车示例-练习1</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
@@ -11,6 +11,10 @@
 				<table>
 					<thead>
 						<tr>
+							<th>
+								<input type="checkbox" @click="checkedAll()" :checked="isCheckedAll">
+								选项
+							</th>
 							<th>序号</th>
 							<th>商品名称</th>
 							<th>商品单价</th>
@@ -20,6 +24,10 @@
 					</thead>
 					<tbody>
 						<tr v-for="(item, index) in list">
+							<td>
+								<input type="checkbox" @click="checkedOne(index)" :checked="checked_list.indexOf(index)>=0" id="item + index">
+								<!-- <input type="checkbox" @click="checkedOne(index)" :checked="isCheckedOne"> -->
+							</td>
 							<td>{{ index + 1}}</td>
 							<td>{{ item.name }}</td>
 							<td>{{ item.price }}</td>
@@ -40,6 +48,6 @@
 			<div v-else>购物车为空</div>
 		</div>
 		<script src="vue.min.js"></script>
-		<script src="index.js"></script>
+		<script src="练习1.js"></script>
 	</body>
 </html>

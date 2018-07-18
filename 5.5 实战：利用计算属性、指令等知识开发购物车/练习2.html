@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Vue购物车示例-练习2</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div id="app" v-cloak>
+		<h1>v-for 一次购物车</h1>
+		<template v-if="goods_list.length">
+			<table>
+				<thead>
+					<tr>
+						<th>商品类别</th>
+						<th>序号</th>
+						<th>商品名称</th>
+						<th>商品价格</th>
+						<th>购买数量</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody v-for="item in goods_list">
+					<tr v-for="(good,index) in item.list">
+						<td>{{ item.category }}</td>
+						<td>{{ index + 1}}</td>
+						<td>{{ good.name }}</td>
+						<td>{{ good.price }}</td>
+						<td>
+							<button @click="handleReduce(index)" 
+							:disabled="good.count === 1">-</button>
+							{{ good.count }}
+							<button @click="handleAdd(index)">+</button>
+						</td>
+						<td>
+							<button @click="handleRemove(index)">移除</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div>总价：￥{{ totalPrice }}</div>
+		</template>
+		<div v-else>购物车为空</div>
+	</div>
+	<script src="vue.min.js"></script>
+	<script src="练习2.js"></script>
+</body>
+</html>

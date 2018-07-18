@@ -1,7 +1,10 @@
 var app = new Vue({
 	el: '#app',
 	data: {
-		list:[
+		goods_list:[
+		{
+			category:"电子产品",
+			list:[
 			{
 				id: 1,
 				name: 'iPhone 7',
@@ -20,7 +23,43 @@ var app = new Vue({
 				price: 21488,
 				count: 1
 			},
-		]	
+			]
+		},
+		{
+			category:"生活用品",
+			list:[
+			{
+				id: 1,
+				name: '牙膏',
+				price: 15,
+				count: 1
+			},
+			{
+				id: 2,
+				name: '毛巾',
+				price: 10,
+				count: 2
+			}
+			]
+		},
+		{
+			category: "果蔬",
+			list:[
+			{
+				id: 1,
+				name: '西红柿',
+				price: 3,
+				count: 1
+			},
+			{
+				id: 2,
+				name: '香蕉',
+				price: 6,
+				count: 3
+			}
+			]
+		}
+		],
 	},
 	methods: {
 		handleReduce:function(index){
@@ -41,9 +80,11 @@ var app = new Vue({
 		// 计算购物车所有商品的总价格
 		totalPrice:function(){
 			var total = 0;
-			for (var i = 0; i < this.list.length ; i++){
-				var item = this.list[i];
-				total += item.price * item.count;
+			for (var i = 0; i < this.goods_list.length; i++){
+				for (var j = 0; j < this.goods_list[i]['list'].length ; j++){
+					var item = this.goods_list[i]['list'][j];
+					total += item.price * item.count;
+				}
 			}
 			//将总价格用千位分隔符转换
 			return total.toString().replace(/\B(?=(\d{3})+$)/g,',');
