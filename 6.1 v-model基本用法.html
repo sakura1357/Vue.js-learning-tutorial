@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>6.1 v-model基本用法</title>
+	</head>
+	<body>
+		<script src="vue.min.js"></script>
+		<h1>1.1绑定输入框input text</h1>
+		<div id="app1">
+			<input type="text" v-model="message" placeholder="输入...">
+			<p>输入内容是：{{ message }}</p>
+		</div>
+		<script>
+			var app1 = new Vue({
+				el: '#app1',
+				data: {
+					message: ''
+				}
+			})
+		</script>
+		<h1>1.2绑定输入框input text，实时更新中文（其实是拼音）</h1>
+		<div id="app2">
+			<input type="text" @input="handleInput" placeholder="输入...">
+			<p>输入内容是：{{ message }}</p>
+		</div>
+		<script>
+			var app2 = new Vue({
+				el: '#app2',
+				data: {
+					message: ''
+				},
+				methods: {
+					handleInput:function(e){
+						this.message = e.target.value;
+					}
+				}
+			})
+		</script>
+		<h1>2.绑定文本域textarea</h1>
+		<div id="app3">
+			<textarea v-model="text" placeholder="输入..."></textarea>
+			<p>输入的内容是：{{ text }}</p>
+		</div>
+		<script>
+			var app3 = new Vue({
+				el: '#app3',
+				data: {
+					text: ''
+				}
+			})
+		</script>
+		<h1>3.1绑定单选按钮input radio，单独使用，无需使用v-model</h1>
+		<div id="app4">
+			<input type="radio" :checked="picked">
+			<label>单选按钮</label>
+		</div>
+		<script>
+			var app4 = new Vue({
+				el: '#app4',
+				data: {
+					picked: true
+				}
+			})
+		</script>
+		<h1>3.2绑定单选按钮input radio，组合使用，实现互斥，需要使用v-model</h1>
+		<div id="app5">
+			<!-- 
+				<label> 标签下的for属性规定label与哪个表单元素绑定
+				显式绑定：for属性值设置为目标表单id值
+				隐式绑定：把input标签放在label标签里面
+				<label><input type="radio" nmae="abc"></label>
+			-->
+			<input type="radio" v-model="picked" value="html" id="html">
+			<label for="html">HTML</label>			
+			<input type="radio" v-model="picked" value="js" id="js">
+			<label for="js">JavaScript</label>			
+			<input type="radio" v-model="picked" value="css" id="css">
+			<label for="css">CSS</label>	
+			<br>
+			<p>选择的项是：{{ picked }}</p>		
+		</div>
+		<script>
+			var app5 = new Vue({
+				el: '#app5',
+				data: {
+					picked: "js"
+				}
+			})
+		</script>
+		<h1>4.1绑定复选框input checbox，单独使用，需要使用v-model</h1>
+		<div id="app6">
+			<input type="checkbox" v-model="zz" id="abc">
+			<label for="abc">选择状态：{{ zz }}</label>
+		</div>
+		<script>
+			var app6 = new Vue({
+				el: '#app6',
+				data: {
+					zz: false
+				}
+			})
+		</script>
+		<h1>4.2绑定复选框input checkbox，组合使用，需要使用v-model和value属性结合</h1>
+		<div id="app7">
+			<input type="checkbox" v-model="checked" value="html" id="html">
+			<label for="html">HTML</label>
+			<input type="checkbox" v-model="checked" value="js" id="js">
+			<label for="js">JavaScript</label>
+			<input type="checkbox" v-model="checked" value="css" id="css">
+			<label for="css">CSS</label>
+			<br>
+			<p>选择的项是： {{ checked }}</p>
+		</div>
+		<script>
+			var app7 = new Vue({
+				el: "#app7",
+				data: {
+					checked: ['html', 'css']
+				}
+			})
+		</script>
+		<h1>5.1绑定下拉选择器，单选</h1>
+		<div id="app8">
+			<select v-model="selected">
+				<option>html</option>
+				<option value="js">JavaScript</option>
+				<option>CSS</option>
+			</select>
+			<p>选择的项是：{{ selected }}</p>
+		</div>
+		<script>
+			var app8 = new Vue({
+				el: "#app8",
+				data: {
+					selected: 'html'
+				}
+			})
+		</script>
+		<h1>5.2绑定下拉选择器，多选，和复选框类似，v-model绑定一个数组</h1>
+		<div id="app9">
+			<select v-model="selected" multiple>
+				<option>html</option>
+				<option value="js">JavaScript</option>
+				<option>CSS</option>
+			</select>
+			<p>选择的项是：{{ selected }}</p>
+		</div>
+		<script>
+			var app9 = new Vue({
+				el: "#app9",
+				data: {
+					selected: ['html', 'js']
+				}
+			})
+		</script>
+		<h1>5.3绑定下拉选择器，使用v-for动态输出option，v-bind动态输出value和text</h1>
+		<div id="app10">
+			<select v-model="selected">
+				<option v-for="option in options" 
+						:value="option.value">{{ option.text }}</option>
+			</select>
+			<p>选择的项是：{{ selected }}</p>
+		</div>
+		<script>
+			var app10 = new Vue({
+				el: '#app10',
+				data: {
+					selected: 'html',
+					options: [
+						{
+							text: 'HTML',
+							value: 'html'
+						},					
+						{
+							text: 'JavaScript',
+							value: 'js'
+						},					
+						{
+							text: 'CSS',
+							value: 'css'
+						},
+					]
+				}
+			})
+		</script>
+	</body>
+</html>

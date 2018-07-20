@@ -47,20 +47,22 @@ var app = new Vue({
 		checkedOne:function(index){
 			
 			// 如果没有在checked_list里面，说明当前是点击选中，
-			console.log(index);
-			if (this.checked_list.indexOf(index) == -1){
-				console.log(index);
-				this.checked_list.push(index);
-				console.log(this.checked_list[index]+"-push");
+			// console.log(index);
+			// if (this.checked_list.indexOf(index) == -1){
+			// 	console.log(index);
+			// 	this.checked_list.push(index);
+			// 	console.log(this.checked_list[index]+"-push");
 
-			}else{//如果在checked_list里面，说明当前是取消选中，
-				this.checked_list.splice(index, 1);
-				console.log(this.checked_list[index]+"-splice");
+			// }else{//如果在checked_list里面，说明当前是取消选中，
+			// 	this.checked_list.splice(index, 1);
+			// 	console.log(this.checked_list[index]+"-splice");
+			// }
+			var item = this.list[index];
+			console.log(this.isCheckedOne);
+			// console.log(typeof(index));
+			if (this.isCheckedOne == true){
+				this.totalPrice += item.price * item.count;
 			}
-			// var item = self.list[index];
-			// self.totalPrice += item.price * item.count;
-			// self.totalPrice -= item.price * item.count;
-
 
 		}
 	},

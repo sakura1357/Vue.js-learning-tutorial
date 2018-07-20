@@ -6,17 +6,18 @@
 </head>
 <body>
 	<script src="vue.min.js"></script>
-	<div id="app">
-		<p v-if="show">这是一段文本</p>
-		<button v-on:click="show = false">点击隐藏</button>
+	<h1>4.1绑定复选框input checbox，单独使用，需要使用v-model</h1>
+	<div id="app5">
+		<input type="checkbox" v-model="checked" id="checked">
+		<label for="checked">选择状态：{{ checked }}</label>
 	</div>
 	<script>
-		var app = new Vue({
-			el: '#app',
+		var app5 = new Vue({
+			el: '#app5',
 			data: {
-				show: true
+				checked: false
 			}
 		})
-	</script>	
+	</script>
 </body>
 </html>

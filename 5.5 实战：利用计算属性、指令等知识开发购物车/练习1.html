@@ -25,8 +25,8 @@
 					<tbody>
 						<tr v-for="(item, index) in list">
 							<td>
-								<input type="checkbox" @click="checkedOne(index)" :checked="checked_list.indexOf(index)>=0" id="item + index">
-								<!-- <input type="checkbox" @click="checkedOne(index)" :checked="isCheckedOne"> -->
+								<!-- <input type="checkbox" @click="checkedOne(index)" :checked="checked_list.indexOf(index)>=0" id="item + index"> -->
+								<input type="checkbox" @click="checkedOne(index)" v-model="isCheckedOne" id="index" value="item.name">
 							</td>
 							<td>{{ index + 1}}</td>
 							<td>{{ item.name }}</td>
