@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Vue 示例</title>
+	</head>
+	<body>
+		<script src="vue.js"></script>
+		<h1>1.组件的用法：全局注册</h1>
+		<div id="app1">
+			<my-component1></my-component1>
+		</div>
+		<div id="app2">
+			<my-component1></my-component1>
+		</div>
+		<script>
+			// 全局注册
+			// my-component:注册的组件的自定义标签名称，推荐使用小写加减号分割的形式命名。
+			Vue.component('my-component1',{
+				//选项，在组件中添加template就可以显示组件的内容了
+				// template的DOM结构必须被一个元素（比如：<div></div>）包含，否则无法渲染
+				template: '<div>这里是组件的内容</div>'
+			});
+
+			var app1 = new Vue({
+				el: "#app1"
+			});
+
+			var app2 = new Vue({
+				el: '#app2'
+			})
+		</script>
+		<h1>2.组件的用法：局部注册</h1>
+		<div id="app3">
+			<your-component></your-component>
+		</div>
+		<script>
+			var Child = {
+				template: "<div>局部注册的内容</div>"
+			}
+			var app3 = new Vue({
+				el: '#app3',
+				components: {
+					'your-component': Child
+				}
+			})
+		</script>
+		<h1>3.需要注意的点：受限制的元素需要使用is属性来挂载组件</h1>
+		<div id="app4">
+			<table>
+				<tbody is="my-component2"></tbody>
+			</table>
+		</div>
+		<script>
+			Vue.component('my-component2', {
+				template: '<div>这里是组件的内容</div>'
+			});
+
+			var app4 = new Vue({
+				el: '#app4'
+			})
+		</script>
+		<h1>4.需要注意的点：组件中使用data选项必须是函数，并且必须将数据return出去</h1>
+		<div id="app5">
+			<my-component3></my-component3>
+		</div>
+		<script>
+			Vue.component('my-component3', {
+				template: '<div>{{ message }}</div>',
+				data: function(){
+					return {
+						message: '全局注册的组件内容'
+					}
+				}
+			});
+
+			var app5 = new Vue({
+				el: '#app5'
+			})
+		</script>
+		<h1>5.需要注意的点：组件中使用data选项return返回独立对象，保证组件的完全复用</h1>
+		<div id="app">
+			<my-component4></my-component4>
+			<my-component4></my-component4>
+			<my-component4></my-component4>
+		</div>
+		<script>
+			Vue.component('my-component4', {
+				template: '<button @click="counter++">{{ counter }}</button>',
+				data: function(){
+					return {
+						counter: 0
+					};
+				}
+			});
+
+			var app = new Vue({
+				el: '#app'
+			})
+		</script>
+	</body>
+</html>

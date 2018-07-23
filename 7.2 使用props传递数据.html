@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Vue 示例</title>
+	</head>
+	<body>
+		<script src="vue.js"></script>
+		<h1>1.props传递数据，字符串数组方式：固定值</h1>
+		<div id="app1">
+			<my-component1 message="来自父组件的数据"></my-component1>
+		</div>
+		<script>
+			Vue.component('my-component1', {
+				props: ['message'],
+				template: '<div>{{ message }}</div>'
+			});
+			var app1 = new Vue({
+				el: '#app1'
+			})
+		</script>
+		<h1>2.props传递数据，字符串数组方式：使用DOM模板，属性命名转换</h1>
+		<div id="app2">
+			<my-component2 warning-text="提示信息"></my-component2>
+		</div>
+		<script>
+			Vue.component('my-component2', {
+				props: ['warningText'],
+				template: '<div>{{ warningText }}</div>'
+			});
+
+			var app2 = new Vue({
+				el: '#app2'
+			})
+		</script>
+		<h1>3.props传递数据，字符串数组方式：传递来自父级的动态数据</h1>
+		<div id="app3">
+			<input type="text" v-model="parentMessage">
+			<my-component3 :message="parentMessage"></my-component3>
+		</div>
+		<script>
+			Vue.component('my-component3', {
+				props: ['message'],
+				template: '<div>{{ message }}</div>'
+			});
+			var app3 = new Vue({
+				el: '#app3',
+				data: {
+					parentMessage: ''
+				}
+			})
+		</script>
+		<h1>4.props传递数据，字符串数组方式：直接传值与使用v-bind绑定的区别</h1>
+		<div id="app4">
+			<!-- 传递一个数组，第一种会把[1,2,3]全部当做字符看待，输出整个字符串的长度7 -->
+			<!-- 传递一个数组，第二种才是传递一个数组，输出数组的长度3 -->
+			<my-component4 message="[1,2,3]"></my-component4>
+			<my-component4 :message="[1,2,3]"></my-component4>
+		</div>
+		<script>
+			Vue.component('my-component4', {
+				props: ['message'],
+				template: '<div>{{ message.length }}</div>'
+			});
+			var app4 = new Vue({
+				el: '#app4'
+			})
+		</script>
+		<h1>5.业务中常用的两种情况(1)：父组件传递初始值，子组件保存初始值，在自己作用域下任意使用和修改</h1>
+		<div id="app5">
+			<my-component5 :initial-count="1"></my-component5>
+		</div>
+		<script>
+			Vue.component('my-component5', {
+				props: ['initialCount'],
+				template: '<div>{{ count }}</div>',
+				data:function(){
+					return {
+						count: this.initialCount
+					}
+				}
+			});
+
+			var app5 = new Vue({
+				el: '#app5'
+			})
+		</script>
+		<h1>6.业务中常用的两种情况(2)：prop作为需要被转变的原始值传入，使用计算属性</h1>
+		<div id="app6">
+			<my-component6 :width="100"></my-component6>
+		</div>
+		<script>
+			Vue.component('my-component6', {
+				props: ['width'],
+				template: '<div :style="style">组件内容</div>',
+				computed:{
+					style:function(){
+						return {
+							width: this.width + 'px'
+						}
+					}
+				}
+			});
+			
+			var app6 = new Vue({
+				el: '#app6'
+			})
+		</script>
+
+	</body>
+</html>

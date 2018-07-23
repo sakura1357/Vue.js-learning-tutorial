@@ -1,0 +1,289 @@
+目录：
+	第7章 组件详解
+		7.1 组件与复用
+			全局注册： Vue.component('my-component', {})
+			局部注册： 在vue实例中使用components选项
+		7.2 使用props传递数据
+			1.传递字符串数组：
+				1)传递固定值
+				2)传递动态值：v-bind绑定
+			2.传递对象数据：用作数据类型验证（String, Number, Boolean, Array, Object, Function）
+		7.3 组件通信
+		7.4 使用slot分发内容
+		7.5 组件高级用法
+		7.6 其他
+		7.7 实战：两个常用组件的开发
+
+第7章 组件详解
+	Vue.js的组件：
+		⭐ 提高重用性，让代码可复用。
+		⭐ 组件间进行通信。
+	1.组件与复用
+		组件的用法：
+			组件在使用之前需要先注册，注册分为全局注册和局部注册两种方式。
+			1)全局注册：任何Vue实例都可以使用，直接使用Vue.component('my-component', {})进行注册
+				<div id="app">
+					<my-component></my-component>
+				</div>
+				<script>
+					// 全局注册
+					// my-component:注册的组件的自定义标签名称，推荐使用小写加减号分割的形式命名。
+					Vue.component('my-component',{
+						//选项，在组件中添加template就可以显示组件的内容了
+						// template的DOM结构必须被一个元素（比如：<div></div>）包含，否则无法渲染
+						template: '<div>这里是组件的内容</div>'
+					});
+
+					var app = new Vue({
+						el: "#app"
+					})
+				</script>
+			2)局部注册：在Vue实例中，使用components选项来局部注册组件，注册后的组件只能在该实例作用域下有效。组件中也可以继续使用components选项来注册组件，从而实现组件的嵌套。
+				<div id="app">
+					<my-component></my-component>
+				</div>
+				<script>
+					var Child = {
+						template: "<div>局部注册的内容</div>"
+					}
+					var app = new Vue({
+						el: '#app',
+						components: {
+							'my-component': Child
+						}
+					})
+				</script>
+			3)一些需要注意的点：
+				• Vue组件的模板在某些情况下会受到HTML的限制，比如<table>内规定只允许是<tr>、<td>、<th>等这些表格元素，所以在<table>内直接使用组件是无效的。这种情况下，可以使用特殊的is属性来挂载组件。常见的限制元素还有<ul>、<ol>、<select>
+					举例：
+					<div id="app">
+						<table>
+							<tbody is="my-component"></tbody>
+						</table>
+					</div>
+					<script>
+						Vue.component('my-component', {
+							template: '<div>这里是组件的内容</div>'
+						});
+
+						var app = new Vue({
+							el: '#app'
+						})
+					</script>
+					注：tbody在渲染时，会被替换为组件的内容。
+				• 组件中除了template选项以外，还可以使用Vue实例的其他选项，比如data、computed、methods、filters等。在使用data时，和实例稍有区别，
+				data必须是函数，然后将数据return出去。
+					举例：
+					<div id="app">
+						<my-component></my-component>
+					</div>
+					<script>
+						Vue.component('my-component', {
+							template: '<div>{{ message }}</div>',
+							data: function(){
+								return {
+									message: '全局注册的组件内容'
+								}
+							}
+						});
+
+						var app = new Vue({
+							el: '#app'
+						})
+					</script>
+				• JavaScript对象的引用关系，如果return出的对象引用了一个外部对象，那这个对象就是共享的，任何一方修改都会同步。
+					示例：组件使用了3次，但是点击任意一个button，3个数字都会加1，原因是组件的data选项return的data引用的是外部对象。
+					<div id="app">
+						<my-component></my-component>
+						<my-component></my-component>
+						<my-component></my-component>
+					</div>
+					<script>
+						var data = {
+							counter: 0
+						}
+
+						Vue.component('my-component', {
+							template: '<button @click="counter++">{{ counter }}</button>',
+							data: function(){
+								return data;
+							}
+						});
+
+						var app = new Vue({
+							el: '#app'
+						})
+					</script>
+					注：因此，必须给组件返回一个新的data对象来独立，这样，点击3个按钮就互不影响了，完全达到复用的目的。
+					示例：
+					<div id="app">
+						<my-component></my-component>
+						<my-component></my-component>
+						<my-component></my-component>
+					</div>
+					<script>
+						Vue.component('my-component', {
+							template: '<button @click="counter++">{{ counter }}</button>',
+							data: function(){
+								return {
+									counter: 0
+								};
+							}
+						});
+
+						var app = new Vue({
+							el: '#app'
+						})
+					</script>
+	2.使用props传递数据
+	• 组件间要进行通信，父组件的模板中包含子组件，父组件要正向地向子组件传递数据或参数，子组件接收到后根据参数的不同来渲染不同的内容或执行操作。这个正向传递数据的过程就是通过props来实现的。
+	• 在组件中，使用props选项来声明需要草丛父级接收的数据，props的值可以是两种，一种是字符串数组，一种是对象。
+	• 单向数据流：在Vue 2.x版本中，使用props选项传递数据是单向的，即父组件数据变化时会传递给子组件，但是反过来不行。而在Vue 1.x里提供了.sync修饰符来支持双向绑定。
+		1)props选项，使用字符串数组传递数据，常用于传递业务数据
+		示例：
+			<div id="app">
+				<my-component message="来自父组件的数据"></my-component>
+			</div>
+			<script>
+				Vue.component('my-component', {
+					props: ['message'],
+					template: '<div>{{ message }}</div>'
+				});
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+		注意：props中声明的数据与组件data函数return的数据主要区别是props的来自父级，而data中的是组件自己的数据，作用域是组件本身，这两种数据都可以在模板template及计算属性computed和方法methods中使用。
+		⭐ 由于HTML特性不区分大小写，当使用DOM模板时，驼峰命名（camelCase）的props名称要转为短横分隔命名（kebab-case）
+		示例：
+			<div id="app">
+				<my-component warning-text="提示信息"></my-component>
+			</div>
+			<script>
+				Vue.component('my-component', {
+					props: ['warningText'],
+					template: '<div>{{ warningText }}</div>'
+				});
+
+				var app = new Vue({
+					el: '#app',
+				})
+			</script>
+		⭐ 传递来自父级的动态数据，需要使用v-bind绑定props的值，当父组件的数据变化时，也会传递给子组件。
+		示例：
+			<div id="app">
+				<input type="text" v-model="parentMessage">
+				<my-component :message="parentMessage"></my-component>
+			</div>
+			<script>
+				Vue.component('my-component', {
+					props: ['message'],
+					template: '<div>{{ message }}</div>'
+				});
+				var app = new Vue({
+					el: '#app',
+					data: {
+						parentMessage: ''
+					}
+				})
+			</script>
+			注释：这里用v-model绑定了父组件的parentMessage，当通过输入框任意输入时，子组件通过props选项接收到的"message"参数也会实时响应，并更新组件模板。
+		⭐ 注意：如果直接传递数字、布尔值、数组、对象等，而不使用v-bind进行绑定，那么传递的仅仅是字符串，而不是参数。
+		示例：
+			<div id="app">
+				<!-- 传递一个数组，第一种会把[1,2,3]全部当做字符看待，输出整个字符串的长度7 -->
+				<!-- 传递一个数组，第二种才是传递一个数组，输出数组的长度3 -->
+				<my-component message="[1,2,3]"></my-component>
+				<my-component :message="[1,2,3]"></my-component>
+			</div>
+			<script>
+				Vue.component('my-component', {
+					props: [message],
+					template: '<div>{{ message.length }}</div>'
+				});
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+		⭐ 业务中常用的两种情况：
+			①父组件传递初始值进来，子组件将它作为初始值保存起来，在自己的作用域下可以随意使用和修改。
+			这种情况可以在组件data再声明一个数据，引用父组件的prop，示例：
+				<div id="app">
+					<my-component :initial-count="1"></my-component>
+				</div>
+				<script>
+					Vue.component('my-component', {
+						props: ['initialCount'],
+						template: '<div>{{ count }}</div>',
+						data:function(){
+							return {
+								count: this.initialCount
+							}
+						}
+					});
+
+					var app = new Vue({
+						el: '#app'
+					})
+				</script>
+				注释：组件中声明了数据count，它在组件初始化时会获取来自父组件的initialCount，之后就与之无关了，只用维护count，这样就可以避免直接操作initialCount
+			② prop作为需要被转变的原始值传入，使用计算属性即可。
+				<div id="app">
+					<my-component :width="100"></my-component>
+				</div>
+				<script>
+					Vue.component('my-component', {
+						props: ['width'],
+						template: '<div :style="style">组件内容</div>',
+						computed:{
+							style:function(){
+								return {
+									width: this.width + 'px'
+								}
+							}
+						}
+					});
+					
+					var app = new Vue({
+						el: '#app'
+					})
+				</script>
+				注释：统一在组件内使用计算属性设置CSS宽度并带单位（px）
+		⭐ 注意：在JavaScript中，数组和对象都是引用类型，指向同一内存空间，所以props是数组或对象时，在子组件内改变是会影响父组件的。
+		2)props选项，使用对象传递数据，一般用作数据验证
+		当你的组件提供给别人使用时，一般推荐进行数据验证，验证的type类型可以是：String、Number、Boolean、Array、Object、Function，type也可以是一个自定义构造器，使用instanceof检测。当props验证失败时，在开发版本下会在控制台抛出一条警告。
+		示例如下：
+			<script>
+				Vue.component('my-component', {
+					props:{
+						// 必须是数字类型
+						propA: Number,
+						// 必须是字符串或数字类型
+						propB: [String,Number],
+						// 必须是布尔值，默认为true
+						propC: {
+							type: Boolean,
+							default: true
+						},
+						// 必须是数字类型，而且是必传参数
+						propD: {
+							type: Number,
+							required: true
+						},
+						// 如果必须是数组或者对象，默认值必须是一个函数来返回
+						propE: {
+							type: Array,
+							default: function(){
+								return [];
+							}
+						},
+						// 自定义一个验证函数
+						propF: {
+							validator:function(value){
+								return value > 10;
+							}
+						}
+					}
+				});
+			</script>
+	
