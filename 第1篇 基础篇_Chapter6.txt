@@ -1,8 +1,11 @@
 目录：
 	第6章 表单与v-model
 		6.1 基本用法
+			输入框、文本域、单选框、复选框、选择列表（下拉选择器）
 		6.2 绑定值
+			绑定静态值、动态绑定值（v-bind绑定）
 		6.3 修饰符
+			.lazy、.number、.trim
 
 第6章 表单与v-model
 	表单类控件承载网页数据的录入与交互，使用指令v-model完成表单的数据双向绑定。
@@ -198,4 +201,99 @@
 					}
 				})
 			</script>
-
+		2)复选框：
+			<div id="app">
+				<input 
+					type="checkbox" 
+					v-model="toggle" 
+					:true-value="value1" 
+					:false-value="value2">
+				<label>复选框</label>
+				<p>{{ toggle }}</p>
+				<p>{{ value1 }}</p>
+				<p>{{ value2 }}</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: "#app",
+					data: {
+						toggle: false,
+						value1: 'a',
+						value2: 'b'
+					}
+				})
+			</script>
+		3)选择列表：
+			<div id="app">
+				<select v-model="selected">
+					<option :value="{ number: 123 }">123</option>
+				</select>
+				{{ selected.number }}
+			</div>
+			<script>
+				var app = new Vue({
+					el: "#app",
+					data: {
+						selected: ''
+					}
+				})
+			</script>
+	3.修饰符
+	与事件的修饰符类似，v-model也有修饰符，用于控制数据同步的时机。
+		.lazy
+		在输入框中，v-model默认是在input事件中同步输入框的内容，使用.lazy修饰符会转变为在change事件中同步，示例：
+			<div id="app">
+				<input type="text" v-model.lazy="message">
+				<p>{{ message }}</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						message: ''
+					}
+				})
+			</script>
+			注：这是message不是实时改变的，而是在失去焦点或者按回车时才更新。
+		.number
+		使用.number修饰符可以将输入转换为Number类型，否则虽然输入的是数字，但是实际上是String类型，比如在数字输入框时会比较有用，示例：
+			<div id="app">
+				<input type="text" v-model.number="message">
+				<!-- 输出message的类型 -->
+				<p>{{ typeof message }}</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						message: ''
+					}
+				})
+			</script>
+		.trim
+		使用.trim修饰符可以自动过滤输入的首尾空格，示例：
+			<div id="app">
+				<input type="text" v-model.trim="message">
+				<p>{{ message }}</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						message: ''
+					}
+				})
+			</script>
+		⭐思维发散：修饰符也可以组合使用，比如：.lazy.trim，举例：
+			<div id="app">
+				<input type="text" v-model.lazy.trim="message">
+				<p>{{ message }}</p>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						message: ''
+					}
+				})
+			</script>

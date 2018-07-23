@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Vue 示例</title>
+	</head>
+	<body>
+		<script src="vue.min.js"></script>
+		<h1>单选按钮</h1>
+		<div id="app1">
+			<input type="radio" v-model="picked" :value="value">
+			<label>单选按钮</label>
+			<p>{{ picked }}</p>
+			<p>{{ value }}</p>
+		</div>
+		<script>
+			var app1 = new Vue({
+				el: "#app1",
+				data: {
+					picked: false,
+					value: 123
+				}
+			})
+		</script>
+		<h1>复选框</h1>
+		<div id="app2">
+			<input 
+				type="checkbox" 
+				v-model="toggle" 
+				:true-value="value1" 
+				:false-value="value2">
+			<label>复选框</label>
+			<p>{{ toggle }}</p>
+			<p>{{ value1 }}</p>
+			<p>{{value2 }}</p>
+		</div>
+		<script>
+			var app2 = new Vue({
+				el: "#app2",
+				data: {
+					toggle: false,
+					value1: 'a',
+					value2: 'b'
+				}
+			})
+		</script>
+		<h1>选择列表</h1>
+		<div id="app3">
+			<select v-model="selected">
+				<option :value="{ number: 123 }">123</option>
+			</select>
+			{{ selected.number }}
+		</div>
+		<script>
+			var app3 = new Vue({
+				el: "#app3",
+				data: {
+					selected: ''
+				}
+			})
+		</script>
+		<h1>v-model的修饰符: .lazy</h1>
+		<div id="app4">
+			<input type="text" v-model.lazy="message">
+			<p>{{ message }}</p>
+		</div>
+		<script>
+			var app4 = new Vue({
+				el: '#app4',
+				data: {
+					message: ''
+				}
+			})
+		</script>
+		<h1>v-model的修饰符: .number</h1>
+		<div id="app5">
+			<input type="text" v-model.number="message">
+			<!-- 输出message的类型 -->
+			<p>{{ typeof message }}</p>
+		</div>
+		<script>
+			var app5 = new Vue({
+				el: '#app5',
+				data: {
+					message: ''
+				}
+			})
+		</script>
+		<h1>v-model的修饰符: .trim</h1>
+		<div id="app6">
+			<input type="text" v-model.trim="message">
+			<p>{{ message }}</p>
+		</div>
+		<script>
+			var app6 = new Vue({
+				el: '#app6',
+				data: {
+					message: ''
+				}
+			})
+		</script>
+		<h1>v-model修饰符组合使用： .lazy.trim</h1>
+		<div id="app7">
+			<input type="text" v-model.lazy.trim="message">
+			<p>{{ message }}</p>
+		</div>
+		<script>
+			var app7 = new Vue({
+				el: '#app7',
+				data: {
+					message: ''
+				}
+			})
+		</script>
+	</body>
+</html>
