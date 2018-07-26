@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>7.4 slot用法</title>
+	</head>
+	<body>
+		<script src="vue.js"></script>
+		<h1>1.默认情况下，不使用slot，将父组件的内容嵌套进子组件中，是不显示的。</h1>
+		<div id="app1">
+			<child-component1>
+				<span>父组件的内容</span>
+				<!-- 上面这行span是不会显示的 -->
+			</child-component1>
+		</div>
+		<script>
+			Vue.component('child-component1', {
+				template: '<div>子组件的内容</div>'
+			});
+			var app1 = new Vue({
+				el: '#app1'
+			})
+		</script>
+		<h1>2.单个slot，父组件若有向子组件插入内容，则显示，如没有插入内容，则显示默认文本</h1>
+		<div id="app2">
+			<child-component2>
+				<p>来自父组件分发的内容</p>
+				<p>来自父组件更多分发的内容</p>
+			</child-component2>
+		</div>
+		<script>
+			Vue.component('child-component2', {
+				template: '<div>\
+					<slot>\
+						<p>如果父组件没有插入内容，我将作为默认出现</p>\
+					</slot>\
+				</div>'
+			});
+			var app2 = new Vue({
+				el: '#app2'
+			})
+		</script>
+		<h1>3.具名slot，具名slot和单个slot共存</h1>		
+		<div id="app3">
+			<child-component3>
+				<h2 slot="header">标题</h2>
+				<p>正文内容：来自父组件分发</p>
+				<p>更多正文内容：来自父组件分发</p>
+				<div slot="footer">底部消息</div>
+			</child-component3>
+		</div>
+		<script>
+			Vue.component('child-component3', {
+				template: '\
+				<div class="container">\
+					<div class="header">\
+						<slot name="header"></slot>\
+					</div>\
+					<div class="main">\
+						<slot></slot>\
+					</div>\
+					<div class="footer">\
+						<slot name="footer"></slot>\
+					</div>\
+				</div>'
+			});
+			var app3 = new Vue({
+				el: '#app3'
+			})
+		</script>		
+		<h1>4.作用域插槽</h1>
+		<div id="app4">
+			<child-component4>
+				<template slot-scope="props">
+					<p>来自父组件的内容</p>
+					<p>{{ props.msg }}</p>
+					<p>{{ props.err }}</p>
+				</template>
+			</child-component4>
+		</div>
+		<script>
+			Vue.component('child-component4', {
+				template: '\
+				<div class="container">\
+					<slot msg="来自子组件的内容" err="zzz"></slot>\
+				</div>'
+			});
+			var app4 = new Vue({
+				el: '#app4'
+			})
+		</script>
+		<h1>5.作用域插槽，列表组件</h1>	
+		<div id="app5">
+			<my-list :books="books">
+				<template slot="book" slot-scope="props">
+					<li>{{ props.bookName }}</li>
+				</template>
+			</my-list>
+		</div>
+		<script>
+			Vue.component('my-list', {
+				props: {
+					books: {
+						type: Array,
+						default: function(){
+							return [];
+						}
+					}
+				},
+				template: '\
+				<ul>\
+					<slot name="book" v-for="book in books" :book-name="book.name"></slot>\
+				</ul>'
+			});
+			var app5 = new Vue({
+				el: '#app5',
+				data: {
+					books: [
+						{name: '《Vue.js实战》'},
+						{name: '《JavaScript语言精粹》'},
+						{name: '《JavaScript高级程序设计》'}
+					]
+				}
+			})
+		</script>		
+		<h1>5.使用$slots访问被slot分发的内容</h1>
+		<div id="app6">
+			<child-component6>
+				<h2 slot="header">标题</h2>
+				<p>正文内容</p>
+				<p>更多的正文内容</p>
+				<div slot="footer">底部信息</div>
+			</child-component6>
+		</div>
+		<script>
+			Vue.component('child-component6', {
+				template: '\
+				<div class="container">\
+					<div class="header">\
+						<slot name="header"></slot>\
+					</div>\
+					<div class="main">\
+						<slot></slot>\
+					</div>\
+					<div class="footer">\
+						<slot name="footer"></slot>\
+					</div>\
+				</div>',
+				mounted:function(){
+					var header = this.$slots.header;
+					var main = this.$slots.default;
+					var footer = this.$slots.footer;
+					console.log(footer);
+					console.log(footer[0].elm.innerHTML);
+					console.log(main);
+				}
+			});
+			var app6 = new Vue({
+				el: '#app6'
+			})
+		</script>		
+	</body>
+</html>

@@ -1,0 +1,268 @@
+目录：
+	第7章 组件详解
+		7.4 使用slot分发内容
+			what's slot?
+			作用域
+			slot用法：默认情况、单个slot、具名slot
+			作用域插槽
+		7.5 组件高级用法
+		7.6 其他
+		7.7 实战：两个常用组件的开发
+
+第7章 组件详解
+	4.使用slot分发内容
+		1)什么是slot（插槽）
+		当需要让组件组合使用，混合父组件的内容与子组件的模板时，就会用到slot，这个过程叫做内容分发（transclusion）。简单来说，假如父组件需要在子组件内放一些DOM，那么这些DOM是显示、不显示、在哪个地方显示、如何显示，就是slot分发负责的活。props传递数据、events触发事件和slot内容分发构成了Vue组件的3个API来源，再复杂的组件也是由这3部分构成的。
+		网站布局：由一级导航、二级导航、左侧列表、正文、底部版权信息5个模块组成。
+			<app>
+				<menu-main></menu-main>
+				<menu-sub></menu-sub>
+				<div class="container">
+					<menu-left></menu-left>
+					<container></container>
+				</div>
+				<app-footer></app-footer>
+			</app>
+			以<app>为例，它有两个特点：
+				· <app>组件不知道它的挂载点会有什么内容。挂载点的内容是由<app>的父组件决定的。
+				· <app>组件很可能有它自己的模板。
+
+		2)作用域
+		编译的作用域：父组件模板的内容是在父组件作用域内编译，子组件模板的内容是在子组件作用域内编译。
+		slot分发的内容，作用域是在父组件上的。
+		示例：
+			<div id="app">
+				<child-component v-show="showChild"></child-component>
+			</div>
+			<script>
+				Vue.component('child-component', {
+					template: '<div>子组件</div>'
+				});
+				var app = new Vue({
+					el: '#app',
+					data: {
+						showChild: true
+					}
+				})
+			</script>
+			注释：这里的showChild绑定的是父组件的数据，因此应该在父组件的data选项中声明数据。如果想在子组件上绑定，应该是如下示例：
+			<div id="app">
+				<child-component></child-component>
+			</div>
+			<script>
+				Vue.component('child-component', {
+					template: '<div v-show="showChild">子组件</div>';
+					data: function(){
+						return{
+							showChild: true
+						}
+					}
+					var app = new Vue({
+						el: '#app'
+					})
+				})
+			</script>
+		3)slot用法
+			⭐ 默认情况
+			不使用slot，将父组件的内容嵌套进子组件中，是不显示的。
+			示例：
+				<div id="app">
+					<child-component>
+						<span>父组件的内容</span>
+						<!-- 上面这行span是不会显示的 -->
+					</child-component>
+				</div>
+				<script>
+					Vue.component('child-component', {
+						template: '<div>子组件的内容</div>'
+					});
+					var app = new Vue({
+						el: '#app'
+					})
+				</script>
+			⭐ 单个slot
+			在子组件中，使用slot标签为子组件开启一个slot，在父组件模板里，插入在子组件标签内的所有内容将替代子组件的slot标签及它的内容。
+			示例：
+				<div id="app">
+					<child-component>
+						<p>来自父组件分发的内容</p>
+						<p>来自父组件更多分发的内容</p>
+					</child-component>
+				</div>
+				<script>
+					Vue.component('child-component', {
+						template: '<div>\
+							<slot>\
+								<p>如果父组件没有插入内容，我将作为默认出现</p>\
+							</slot>\
+						</div>'
+					});
+					var app = new Vue({
+						el: '#app'
+					})
+				</script>
+				注释：子组件child-component的模板定义了一个<slot>元素，并用一个<p>作为默认的内容，在父组件没有使用slot时（即没有向子组件插入内容），会渲染这段默认文本；如果写入了slot（即示例所示，插入了两个<p>标签的内容，即使有多个标签，也会一起被插入），则会替换整个<slot>。
+				因此，示例渲染后的结果为：
+					<div id="app">
+						<div>
+							<p>来自父组件分发的内容</p>
+							<p>来自父组件更多分发的内容</p>
+						</div>
+					</div>
+			注：子组件<slot>内的备用默认显示内容，它的作用域是子组件本身。
+			⭐ 具名slot
+			给<slot>元素指定一个name后可以在子组件的不同位置分发多个内容，只需要父组件在要分发的内容标签里添加slot="name名"属性，子组件在对应分发位置的slot标签里添加name="name名"属性，则就会将对应的内容插入到对应的位置了。同时，具名slot可以与单个slot共存。
+			示例：
+				<div id="app">
+					<child-component>
+						<h2 slot="header">标题（使用具名slot）</h2>
+						<p>正文内容：来自父组件分发，使用单个slot</p>
+						<p>更多正文内容：来自父组件分发，使用单个slot</p>
+						<div slot="footer">底部消息（使用具名slot）</div>
+					</child-component>
+				</div>
+				<script>
+					Vue.component('child-component', {
+						template: '\
+						<div class="container">\
+							<div class="header">\
+								<slot name="header"></slot>\
+							</div>\
+							<div class="main">\
+								<slot></slot>\
+							</div>\
+							<div class="footer">\
+								<slot name="footer"></slot>\
+							</div>\
+						</div>'
+					});
+					var app = new Vue({
+						el: '#app'
+					})
+				</script>
+				注释：子组件声明了3个<slot>元素，有1个没有使用name属性，它将作为默认slot出现，父组件中没有使用slot="name"属性的元素和内容都将出现在这里。如果没有指定默认的匿名slot，父组件内多余的内容片断都将被抛弃。
+		4)作用域插槽
+		作用域插槽是一种特殊的slot，使用一个可以复用的模板替换已渲染元素。
+		示例：
+			<div id="app">
+				<child-component>
+					<template scope="props">
+						<p>来自父组件的内容</p>
+						<p>{{ props.msg }}</p>
+					</template>
+				</child-component>
+			</div>
+			<script>
+				Vue.component('child-component', {
+					template: '\
+					<div class="container">\
+						<slot msg="来自子组件的内容"></slot>\
+					</div>'
+				});
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+			注释：子组件模板中，在<slot>元素上有一个类似props传递数据给组件的写法msg="xxx"，将数据传到了插槽。在父组件中使用了<template>元素，而且拥有一个scope="props"的属性（Vue 2.5版本以后，已将scope属性替换为slot-scope），这里的props只是临时变量。template内可以通过临时变量props访问来自子组件插槽的数据msg。
+		作用域插槽更具代表性的用例是列表组件，允许组件自定义应该如何渲染列表每一项。
+		示例：
+			<div id="app">
+				<my-list :books="books">
+					<template slot="book" scope="props">
+						<li>{{ props.bookName }}</li>
+					</template>
+				</my-list>
+			</div>
+			<script>
+				Vue.component('my-list', {
+					props: {
+						books: {
+							type: Arrary,
+							default: function(){
+								return [];
+							}
+						}
+					},
+					template: '\
+					<ul>\
+						<slot name="book" v-for="book in books" :book-name="book.name"></slot>\
+					</ul>'
+				});
+				var app = new Vue({
+					el: '#app',
+					data: {
+						books: [
+							{name: '《Vue.js实战》'},
+							{name: '《JavaScript语言精粹》'},
+							{name: '《JavaScript高级程序设计》'}
+						]
+					}
+				})
+			</script>
+			注释：子组件my-list接收一个来自父级的prop数组books，并且将它在name为book的slot上使用v-for指令循环，同时暴露一个变量bookName。
+		5)访问slot
+		Vue 2.x提供了$slots方法来访问被slot分发的内容，示例：
+			<div id="app">
+				<child-component>
+					<h2 slot="header">标题</h2>
+					<p>正文内容</p>
+					<p>更多的正文内容</p>
+					<div slot="footer">底部信息</div>
+				</child-component>
+			</div>
+			<script>
+				Vue.component('child-component', {
+					template: '\
+					<div class="container">\
+						<div class="header">\
+							<slot name="header"></slot>\
+						</div>\
+						<div class="main">\
+							<slot></slot>\
+						</div>\
+						<div class="footer">\
+							<slot name="footer"></slot>\
+						</div>\
+					</div>',
+					mounted:function(){
+						var header = this.$slots.header;
+						var main = this.$slots.default;
+						var footer = this.$slots.footer;
+						console.log(footer);
+						console.log(footer[0].elm.innerHTML);
+					}
+				});
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+			注释：通过$slots可以访问某个具名slot，this.$slots.default包括了所有没有被包含在具名slot中的节点。
+			$slots在业务中几乎用不到，在用render函数（进阶篇中将介绍）创建组件时会比较有用，但主要还是用于独立组件开发中。
+	5.组件高级用法
+		1)递归组件
+		组件在它的模板内可以递归地调用自己，只要给组件设置name的选项就可以了。
+		示例：
+			<div id="app">
+				<child-component :count="1"></child-component>
+			</div>
+			<script>
+				Vue.component('child-component', {
+					name: 'child-component',
+					props: {
+						count: {
+							type: Number,
+							default: 1
+						}
+					},
+					template: '\
+					<div class="child">\
+						<child-component :count="count + 1" v-if="count < 3"></child-component>\
+					</div>'
+				});
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+			注释：设置name后，在组件模板内就可以递归使用了，不过需要注意的是，必须给一个条件来限制递归数量，否则会抛出错误：max stack size exceeded。
+		2)内联模板
+		3)动态组件

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Vue 示例</title>
+	</head>
+	<body>
+		<script src="vue.js"></script>
+		<h1>1.组件通信：子组件-->父组件，使用自定义事件</h1>
+		<div id="app1">
+			<p>总数： {{ total }}</p>
+			<my-component1 
+				@increase="handleGetTotal"
+				@reduce="handleGetTotal"></my-component1>
+		</div>
+		<script>
+			Vue.component('my-component1', {
+				template: '\
+				<div>\
+					<button @click="handleIncrease">+1</button>\
+					<button @click="handleReduce">-1</button>\
+				</div>',
+				data: function(){
+					return {
+						counter: 0
+					}
+				},
+				methods:{
+					handleIncrease:function(){
+						this.counter++;
+						this.$emit('increase', this.counter);
+					},
+					handleReduce:function(){
+						this.counter--;
+						this.$emit('reduce', this.counter);
+					}
+				}
+			});
+
+			var app1 = new Vue({
+				el: '#app1',
+				data: {
+					total: 0
+				},
+				methods: {
+					handleGetTotal:function(total){
+						this.total = total;
+					}
+				}
+			})
+		</script>
+		<h1>2.组件通信：子组件-->父组件,使用v-model</h1>
+		<div id="app2">
+			<p>总数： {{ total }}</p>
+			<my-component2 v-model="total"></my-component2>
+		</div>
+		<script>
+			Vue.component('my-component2', {
+				template: '<button @click="handleClick">+1</button>',
+				data: function(){
+					return {
+						counter: 0
+					}
+				},
+				methods:{
+					handleClick:function(){
+						this.counter++;
+						this.$emit('input', this.counter);
+					}
+				}
+			});
+			var app2 = new Vue({
+				el: '#app2',
+				data: {
+					total: 0
+				}
+			})
+		</script>		
+		<h1>3.组件通信：子组件-->父组件，实现一个具有双向绑定的v-model组件</h1>
+		<div id="app3">
+			<p>总数：{{ total }}</p>
+			<my-component3 v-model="total"></my-component3>
+			<button @click="handleReduce">-1</button>
+		</div>
+		<script>
+			Vue.component('my-component3', {
+				props: ['value'],
+				template: '<input :value="value" @input="updateValue" />',
+				methods: {
+					updateValue: function(event){
+						this.$emit('input', event.target.value);
+					}
+				}
+			});
+			var app3 = new Vue({
+				el: '#app3',
+				data: {
+					total: 0
+				},
+				methods: {
+					handleReduce:function(){
+						this.total--;
+					}
+				}
+			})
+		</script>		
+		<h1>4.组件通信：使用中央事件总线（bus）</h1>
+		<div id="app4">
+			{{ message }}
+			<component-a></component-a>
+		</div>
+		<script>
+			var bus = new Vue();
+			Vue.component('component-a', {
+				template: '<button @click="handleEvent">传递事件</button>',
+				methods:{
+					handleEvent:function(){
+						bus.$emit('on-message', '来自组件component-a的内容');
+					}
+				}
+			});
+
+			var app4 = new Vue({
+				el: '#app4',
+				data: {
+					message: ''
+				},
+				mounted: function(){
+					var _this = this;
+					bus.$on('on-message', function(msg){
+						_this.message = msg;
+					});
+				}
+			})
+		</script>		
+		<h1>5.组件通信：使用父链，子组件直接修改父组件的数据</h1>
+		<div id="app5">
+			{{ message }}
+			<component-b></component-b>
+		</div>
+		<script>
+			Vue.component('component-b', {
+				template: '<button @click="handleEvent">通过父链直接修改数据</button>',
+				methods:{
+					handleEvent:function(){
+						this.$parent.message = '来自组件component-b的内容';
+					}
+				}
+			});
+			var app5 = new Vue({
+				el: '#app5',
+				data: {
+					message: ''
+				}
+			})
+		</script>
+		<h1>6.组件通信：使用子组件索引，ref来进行组件间的通信</h1>			
+		<div id="app6">
+			<button @click="handleRef">通过ref获取子组件实例</button>
+			<component-c ref="comC"></component-c>
+		</div>
+		<script>
+			Vue.component('component-c', {
+				template: "<div>子组件component-c</div>",
+				data: function(){
+					return {
+						message: '子组件内容'
+					}
+				}
+			});
+			var app6 = new Vue({
+				el: '#app6',
+				methods: {
+					handleRef:function(){
+						var msg = this.$refs.comC.message;
+						console.log(msg);
+					}
+				}
+			})
+		</script>	
+		<h1>7.组件通信，ref普通标签与组件标签</h1>	
+		<!-- Vue 2.x会自动判断是普通标签还是组件 -->
+		<div id="app7">
+			<p ref="p"></p>
+			<child-component ref="child"></child-component>
+		</div>
+		<script>
+			Vue.component('child-component', {
+				template: '<p>child</p>'
+			});
+			var app7 = new Vue({
+				el: '#app7',
+				mounted(){
+					// <p></p>
+					console.log(this.$refs.p);
+					// VueComponent
+					console.log(this.$refs.child);
+				}
+			})
+		</script>
+	</body>
+</html>
