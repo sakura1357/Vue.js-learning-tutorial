@@ -28,5 +28,92 @@
 				el: '#app1'
 			})
 		</script>
+		<h2>2.内联模板 （Vue.js 2.5及以后版本已去除此特性）无法渲染父组件中声明的数据 </h2>
+		<div id="app2">
+			<child-component2 inline-template>
+				<div>
+					<h2>在父组件中定义子组件的模板</h2>
+					<p>{{ message }}</p>
+					<p>{{ msg }}</p>
+				</div>
+			</child-component2>
+		</div>
+		<script>
+			Vue.component('child-component2', {
+				data:function(){
+					return {
+						msg: '在子组件声明的数据'
+					}
+				}
+			});
+			var app2 = new Vue({
+				el: '#app2',
+				data: {
+					message: '在父组件声明的数据'
+				}
+			})
+		</script>	
+		<h1>3.动态组件</h1>	
+		<div id="app3">
+			<component :is="currentView"></component>
+			<button @click="handleChangeView('A')">切换到A</button>
+			<button @click="handleChangeView('B')">切换到B</button>
+			<button @click="handleChangeView('C')">切换到C</button>
+		</div>
+		<script>
+			var app3 = new Vue({
+				el: '#app3',
+				components: {
+					comA: {
+						template: '<div>组件A</div>'
+					},
+					comB: {
+						template: '<div>组件B</div>'
+					},
+					comC:{
+						template: '<div>组件C</div>'
+					}
+				},
+				data:{
+					currentView: 'comA'
+				},
+				methods: {
+					handleChangeView:function(component){
+						this.currentView = 'com' + component;
+					}
+				}
+			})
+		</script>		
+		<h1>3.动态组件，直接绑定在组件对象上</h1>
+		<div id="app4">
+			<component :is="currentView"></component>
+		</div>
+		<script>
+			var Home = {
+				template: '<p>Welcome home!</p>'
+			};
+			var app = new Vue({
+				el: '#app4',
+				data: {
+					currentView: Home
+				}
+			})
+		</script>		
+		<h1>4.异步组件</h1>
+		<div id="app5">
+			<child-component5></child-component5>
+		</div>
+		<script>
+			Vue.component('child-component5', function(resolve, reject){
+				window.setTimeout(function(){
+					resolve({
+						template: '<div>我是异步渲染的</div>'
+					});
+				}, 2000);
+			}); 
+			var app5 = new Vue({
+				el: '#app5'
+			})
+		</script>		
 	</body>
 </html>

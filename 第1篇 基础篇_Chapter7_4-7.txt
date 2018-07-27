@@ -6,7 +6,9 @@
 			slot用法：默认情况、单个slot、具名slot
 			作用域插槽
 		7.5 组件高级用法
+			递归组件、内联模板、动态组件、异步组件
 		7.6 其他
+
 		7.7 实战：两个常用组件的开发
 
 第7章 组件详解
@@ -265,4 +267,194 @@
 			</script>
 			注释：设置name后，在组件模板内就可以递归使用了，不过需要注意的是，必须给一个条件来限制递归数量，否则会抛出错误：max stack size exceeded。
 		2)内联模板
+		组件的模板一般都是在template选项内定义的，Vue提供了一个内联模板的功能，在使用组件时，给组件标签使用inline-template特性，组件就会把它的内容当作模板，而不是把它当内容分发，这让模板更灵活。
+		示例：
+			<div id="app">
+				<child-component inline-template>
+					<div>
+						<h2>在父组件中定义子组件的模板</h2>
+						<p>{{ message }}</p>
+						<p>{{ msg }}</p>
+					</div>
+				</child-component>
+			</div>
+			<script>
+				Vue.component('child-component', {
+					data:function(){
+						return {
+							msg: '在子组件声明的数据'
+						}
+					}
+				});
+				var app = new Vue({
+					el: '#app',
+					data: {
+						message: '在父组件声明的数据'
+					}
+				})
+			</script>
+			注释：在父组件中声明的数据message和子组件中声明的数据msg，两个都可以渲染（如果同名，优先使用子组件的数据）（Vue.js 2.5及以后版本已去除此特性）。这反而是内联模板的缺点，就是作用域比较难理解，如果不是非常特殊的场景，建议不要轻易使用内联模板。
 		3)动态组件
+		Vue.js提供了一个特殊的元素<component>用来动态地挂载不同的组件，使用is特性来选择要挂载的组件。
+		示例：
+			<div id="app">
+				<component :is="currentView"></component>
+				<button @click="handleChangeView('A')">切换到A</button>
+				<button @click="handleChangeView('B')">切换到B</button>
+				<button @click="handleChangeView('C')">切换到C</button>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					components: {
+						comA: {
+							template: '<div>组件A</div>'
+						},
+						comB: {
+							template: '<div>组件B</div>'
+						},
+						comC:{
+							template: '<div>组件C</div>'
+						}
+					},
+					data:{
+						currentView: 'comA'
+					},
+					methods: {
+						handleChangeView:function(component){
+							this.currentView = 'com' + component;
+						}
+					}
+				})
+			</script>
+			注释：动态地改变currentView的值就可以动态挂载组件了。也可以直接绑定在组件对象上：
+			<div id="app">
+				<component is="currentView"></component>
+			</div>
+			<script>
+				var Home = {
+					template: '<p>Welcome home!</p>'
+				}
+				Vue.component({
+					el: '#app',
+					data: {
+						currentView: Home
+					}
+				})
+			</script>
+		4)异步组件
+		当工程项目足够大，使用的组件足够多时，就需要考虑性能问题了，已开始把所有组件都加载是没必要的一笔开销。Vue.js允许将组件定义为一个工厂函数，动态地解析组件。Vue.js只在组件需要渲染时触发工厂函数，并且把结果缓存起来，用于后面的再次渲染。
+		示例：
+			<div id="app">
+				<child-component></child-component>
+			</div>
+			<script>
+				Vue.component('child-component', function(resolve, reject){
+					window.setTimeout(function(){
+						resolve({
+							template: '<div>我是异步渲染的</div>'
+						});
+					}, 2000);
+				}); 
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+			注释：工厂函数接收一个resolve回调，在收到服务器下载的组件定义是时调用。也可以调用reject(reason)指示加载失败。
+	6.其他
+		1)$nextTick
+		Vue的异步更新队列：Vue在观察到数据变化时并不是直接更新DOM，而是开启一个队列，并缓冲在同一事件循环中发生的所有数据改变。在缓冲时会去除重复数据，从而避免不必要的计算和DOM操作。然后，在下一个事件循环tick中，Vue刷新队列并执行实际（已去重的）工作。所以如果你用一个for循环来动态改变数据100次，其实它只会应用最后一次改变，如果没有这种机制，DOM就要重绘100次，这显然是一个很大的开销。
+		Vue会根据当前浏览器环境优先使用原生的Promise.then和MutationObserver，如果都不支持，就会采用setTimeout代替。
+		示例：
+			<div id="app">
+				<div id="div" v-if="showDiv">这是一段文本</div>
+				<button @click="getText">获取div内容</button>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						showDiv: false
+					},
+					methods: {
+						getText:function(){
+							this.showDiv = true;
+							var text = document.getElementById('div').innerHTML;
+							console.log(text);
+						}
+					}
+				})
+			</script>
+			注释：此段代码，运行后控制台会抛出错误：Cannot read property 'innnerHTML' of null，意思就是获取不到div元素。原因是在执行this.showDiv = true时，div仍然还是没有被创建出来，直到下一个Vue事件循环时，才开始创建，$nextTick就是用来知道什么时候DOM更新完成的。
+			因此示例代码需要修改为：
+			<div id="app">
+				<div id="div" v-if="showDiv">这是一段文本</div>
+				<button @click="getText">获取div内容</button>
+			</div>
+			<script>
+				var app = new Vue({
+					el: '#app',
+					data: {
+						showDiv: false
+					},
+					methods: {
+						getText:function(){
+							this.showDiv = true;
+							this.$nextTick(function(){
+								var text = document.getElementById('div').innerHTML;
+								console.log(text);
+							});
+						}
+					}
+				})
+			</script>
+			注释：这时点击按钮，控制台就打印出div的内容“这是一段文本”了。
+			理论上，我们应该不用去主动操作DOM，因为Vue的核心思想就是数据驱动DOM，但在很多业务里，我们避免不了会使用一些第三方库，比如popper.js、swiper等，这些基于原生JavaScript的库都有创建和更新及销毁的完整生命周期，与Vue配合使用时，就要利用好$nextTick。
+		2)X-Templates
+		Vue提供了一种定义模板的方式，在<script></script>标签里使用text/x-template类型，并且指定一个id，将这个id赋给template。
+		示例：
+			<div id="app">
+				<my-component></my-component>
+				<script type="text/x-template" id="my-component">
+					<div>这是组件的内容</div>
+				</script>
+			</div>
+			<script>
+				Vue.component('my-component', {
+					template: '#my-component'
+				});
+				var app = new Vue({
+					el: '#app'
+				})
+			</script>
+			注释：在script标签里，可以愉快地写HTML代码，不用考虑换行等问题。
+		3)手动挂载实例
+		目前所创建的实例都是通过new Vue()的形式创建出来的。在一些非常特殊的情况下，我们需要动态地去创建Vue实例，Vue提供了Vue.extend和$mount两个方法来手动挂载一个实例。
+		Vue.extend是基础Vue构造器，创建一个“子类”，参数是一个包含组件选项的对象。
+		如果Vue实例在实例化时没有收到el选项，它就处于“未挂载”状态，没有关联的DOM元素。可以使用$mount()手动地挂载一个未挂载的实例。这个方法返回实例自身，因而可以链式调用其他实例方法。
+		示例：
+			<div id="mount-div">
+				
+			</div>
+			<script>
+				var MyComponent = Vue.extend({
+					template: '<div>Hello: {{ name }}</div>',
+					data: function(){
+						return {
+							name: 'Aresn'
+						}
+					}
+				});
+				new MyComponent().$mount('#mount-div');
+			</script>
+			注释：运行后，id为mount-div的div元素会被替换为组件MyComponent的template内容。
+			还有两种写法：
+			① new MyComponent().$mount('#mount-div');
+			② new MyComponent({
+					el: '#mount-div'
+				})
+			③ var component = new MyComponent().$mount();
+			   document.getElementById('mount-div').appendChild(component.$el);
+			注：手动挂载实例（组件）是一种比较极端的高级用法，在业务中几乎用不到，只在开发一些复杂的独立组件时可能会使用，所以只做了解就好。
+			
+
