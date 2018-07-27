@@ -8,8 +8,7 @@
 		7.5 组件高级用法
 			递归组件、内联模板、动态组件、异步组件
 		7.6 其他
-
-		7.7 实战：两个常用组件的开发
+			$nextTick、x-template、手动挂载实例
 
 第7章 组件详解
 	4.使用slot分发内容
@@ -456,5 +455,5 @@
 			③ var component = new MyComponent().$mount();
 			   document.getElementById('mount-div').appendChild(component.$el);
 			注：手动挂载实例（组件）是一种比较极端的高级用法，在业务中几乎用不到，只在开发一些复杂的独立组件时可能会使用，所以只做了解就好。
-			
+
 
