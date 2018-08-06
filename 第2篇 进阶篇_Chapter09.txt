@@ -1,0 +1,21 @@
+目录：
+	第9章 Render函数
+		9.1 什么是Virtual Dom
+		9.2 什么是Render函数
+		9.3 createElement用法
+			9.3.1 基本参数
+			9.3.2 约束
+			9.3.3 使用JavaScript代替模板功能
+		9.4 函数化组件
+		9.5 JSX
+		9.6 实战：使用Render函数开发可排序的表格组件
+		9.7 实战：留言列表
+		9.8 总结
+
+
+第9章 Render函数
+	Vue.js 2.x与Vue.js 1.x最大的区别就在于2.x使用了Virtual Dom（虚拟DOM）来更新DOM节点，提升渲染性能。
+	1.什么是Virtual Dom
+	React和Vue.js 2.x都使用了Virtual Dom技术，Virtual Dom并不是真正意义上的DOM，而是一个轻量级的JavaScript对象，在状态发生变化时，Virtual Dom会进行Diff运算，来更新只需要被替换的DOM，而不是全部重绘。
+	
+

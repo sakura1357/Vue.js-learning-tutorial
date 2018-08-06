@@ -1,0 +1,81 @@
+目录：
+	第10章 使用webpack
+		10.1 前端工程化与webpack
+		10.2 webpack基础配置
+		10.3 单文件组件与vue-loader
+		10.4 用于生产环境
+
+第10章 使用webpack
+	1.前端工程化与webpack
+		前端工程化工具webpack：业务中写的各种格式的文件（typescript、less、jpg、vue、css等），这些格式的文件通过特定的加载器（Loader）编译后，最终统一生成为.js、.css、.png等静态资源。在webpack里面，一张图片、一个css甚至一个字体，都称为模块（Module），彼此存在依赖关系，webpack就是来处理模块间的依赖关系的，并把他们进行整合打包。
+		export与import：
+			1.export的时候指定名称，在import使用的时候需要预先知道指定名称。
+				//config.js
+				var Config = {
+					version: '1.0.0'
+				};
+				export { Config };
+				或者：
+				export var Config = {
+					version: '1.0.0'
+				};
+				//add.js
+				export function add(a,b){
+					return a + b;
+				};
+
+				//main.js
+				import { Config } from './config.js';
+				import { add } from './add.js';
+
+				console.log(Config); // {version: '1.0.0'}
+				console.log(add(3,5)); // 8
+
+			2.export使用默认，在import使用时可以自定义名称。
+				//config.js
+				export default {
+					version: '1.0.0'
+				};
+
+				//add.js
+				export default function(a, b){
+					return a + b;
+				};
+
+				//main.js
+				import conf from './config.js';
+				import Add from './add.js';
+
+				console.log(conf); // {version: '1.0.0'}
+				console.log(Add(3, 5)) // 8
+			3.如果是使用npm安装了一些库，在webpack中可以直接导入，例如：
+				import Vue from 'vue'; //导入Vue的库，并命名为Vue
+				import $ from 'jquery'; //导入jquery的库，并命名为$
+	2.webpack基础配置
+		1)安装webpack与webpack-dev-server
+			使用npm初始化配置：生成package.json文件
+			npm init
+			本地局部安装webpack：（--save-dev作为开发依赖安装）
+			npm install webpack --save-dev
+			cnpm install webpack --save-dev（使用cnpm淘宝源安装）
+			本地局部安装webpack-dev-server：
+			npm install webpack-dev-server
+			cnpm install webpack-dev-server （使用cnpm淘宝源安装）
+			cnpm install webpack-cli
+		2)js文件
+		webpack其实就是一个.js配置文件，记录了模块之间的依赖关系。webpack中最重要也是必选的两项是入口（Entry）和出口（Output）。入口的作用是告诉webpack从哪里开始寻找依赖，并且编译，出口则用来配置编译后的文件存储位置和文件名。
+    	//"dev": "webpack-dev-server --host 127.0.0.2 --port 8088 --open --config webpack.config.js"
+
+    	生产环境下编译，打包main.js：
+    	webpack --progress --hide-modules
+    	3)逐步完善配置文件
+    	通过安装不同的加载器可以对各种后缀名的文件进行处理，比如要写CSS样式，就要用到style-loader和css-loader。
+    	npm install css-loader --save-dev
+    	npm install style-loader --save-dev
+		webpack的插件：
+			extract-text-webpack-plugin插件：把散落在各地的css提取出来，并生成一个main.css文件，最终在index.html里通过<link>形式加载它。
+			npm install extract-text-webpack-plugin --save-dev
+
+
+
+
